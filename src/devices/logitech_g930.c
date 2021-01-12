@@ -64,17 +64,19 @@ static int g930_request_battery(hid_device* device_handle)
         return res;
     }
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 30; i++) {
         res = hid_get_feature_report(device_handle, buf, MSG_SIZE);
-
         if (res < 0) {
             return res;
         }
 
-        if (i < 2) {
-            usleep(100000);
-        }
+        if (buf[1] != 5)
+            break;
+        usleep(20000);
     }
+    if (buf[1] != 13)
+        return -1;
+
     int batteryPercent = map((int)buf[13], BATTERY_MIN, BATTERY_MAX, 0, 100);
     return batteryPercent;
 }
